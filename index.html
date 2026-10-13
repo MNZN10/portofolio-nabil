@@ -734,7 +734,7 @@
         const suggestionStatus = document.getElementById("suggestion-status");
         const suggestionSubmit = document.getElementById("suggestion-submit");
         const suggestionToken = document.getElementById("suggestion-token");
-        const suggestionResponseUrl = "https://script.google.com/macros/s/AKfycbzocyIqHRj_srrMp0X4E0jTurjBJqRIXw41zvZ-s2BvbrNZ1qlG9TXB8pAqB_NS2SDM/exec";
+        const suggestionResponseUrl = "https://script.google.com/macros/s/AKfycbwSp0U20vF3WbkqIyBf0nlt6IdKGz2AcfZkT-uJEOEysB4vb8HfjpSuTWJH2a2hTUeV/exec";
 
         suggestionText.addEventListener("input", () => suggestionText.setCustomValidity(""));
         suggestionForm.addEventListener("submit", (event) => {
@@ -768,7 +768,7 @@
                     suggestionText.value = "";
                     suggestionStatus.textContent = "Saran berhasil dikirim. Terima kasih!";
                 } else {
-                    suggestionStatus.textContent = "Arigathanks Gozaimuch!";
+                    suggestionStatus.textContent = "Saran belum terkirim. Periksa koneksi lalu coba lagi.";
                 }
                 suggestionSubmit.disabled = false;
             };
@@ -776,7 +776,7 @@
             window.addEventListener("message", handleResponse);
             responseTimeout = window.setTimeout(() => {
                 window.removeEventListener("message", handleResponse);
-                suggestionStatus.textContent = "Arigathanks Gozaimuch!";
+                suggestionStatus.textContent = "Belum ada konfirmasi pengiriman. Periksa koneksi lalu coba lagi.";
                 suggestionSubmit.disabled = false;
             }, 20000);
             suggestionForm.submit();
