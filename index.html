@@ -804,7 +804,7 @@
         });
 
         async function loadCertificates(requestId) {
-            const supportedExtensions = ["webp", "jpg", "jpeg", "png", "pdf"];
+            const supportedExtensions = ["webp", "jpg", "jpeg", "png"];
             const maxCertificates = 100;
             const certificateDirectory = "sertifikat/";
             const certificates = [];
@@ -838,32 +838,27 @@
 
             if (requestId !== certificateRequestId) return;
             if (certificates.length === 0) {
-                certificateStatus.textContent = "Belum ada sertifikat. Unggah file sertifikat1 dengan ekstensi .pdf, .jpg, .jpeg, .png, atau .webp ke folder sertifikat.";
+                certificateStatus.textContent = "Belum ada gambar sertifikat. Unggah file gambar bernomor berurutan dengan ekstensi .webp, .jpg, .jpeg, atau .png ke folder sertifikat.";
                 return;
             }
 
             certificateStatus.textContent = `${certificates.length} sertifikat ditemukan.`;
-            certificates.forEach(({ number, filename, extension }) => {
-                const link = document.createElement("a");
-                link.className = "certificate-item";
-                link.href = filename;
-                link.target = "_blank";
-                link.rel = "noopener noreferrer";
-                link.setAttribute("aria-label", `Buka sertifikat ${number}`);
+            certificates.forEach(({ number, filename }) => {
+                const item = document.createElement("div");
+                item.className = "certificate-item";
+                item.setAttribute("aria-label", `Sertifikat ${number}`);
 
-                if (extension !== "pdf") {
-                    const image = document.createElement("img");
-                    image.src = filename;
-                    image.alt = `Pratinjau sertifikat ${number}`;
-                    image.loading = "lazy";
-                    image.decoding = "async";
-                    link.append(image);
-                }
+                const image = document.createElement("img");
+                image.src = filename;
+                image.alt = `Sertifikat ${number}`;
+                image.loading = "lazy";
+                image.decoding = "async";
+                item.append(image);
 
                 const label = document.createElement("span");
-                label.textContent = `Sertifikat ${number}${extension === "pdf" ? " · PDF" : ""}`;
-                link.append(label);
-                certificateList.append(link);
+                label.textContent = `Sertifikat ${number}`;
+                item.append(label);
+                certificateList.append(item);
             });
         }
 
