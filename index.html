@@ -806,6 +806,7 @@
         async function loadCertificates(requestId) {
             const supportedExtensions = ["pdf", "jpg", "jpeg", "png", "webp"];
             const maxCertificates = 100;
+            const certificateDirectory = "sertifikat/";
             const certificates = [];
 
             certificateList.replaceChildren();
@@ -814,7 +815,7 @@
             try {
                 for (let number = 1; number <= maxCertificates; number += 1) {
                     const candidates = await Promise.all(supportedExtensions.map(async (extension) => {
-                        const filename = `sertifikat${number}.${extension}`;
+                        const filename = `${certificateDirectory}sertifikat${number}.${extension}`;
                         const response = await fetch(filename, { method: "HEAD" });
                         if (response.status === 404) return null;
                         if (!response.ok) throw new Error(`Tidak dapat memeriksa ${filename} (${response.status}).`);
@@ -836,7 +837,7 @@
 
             if (requestId !== certificateRequestId) return;
             if (certificates.length === 0) {
-                certificateStatus.textContent = "Belum ada sertifikat. Unggah sertifikat1 dengan ekstensi .pdf, .jpg, .jpeg, .png, atau .webp ke folder yang sama dengan index.html.";
+                certificateStatus.textContent = "Belum ada sertifikat. Unggah file sertifikat1 dengan ekstensi .pdf, .jpg, .jpeg, .png, atau .webp ke folder sertifikat.";
                 return;
             }
 
