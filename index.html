@@ -217,6 +217,7 @@
         .caption-like svg { display: block; width: 24px; height: 24px; }
         :root[data-theme="soft-light"] .caption-like { color: #222; }
         :root[data-theme="soft-light"] .caption-like:focus-visible { outline-color: #6e8c74; }
+        .like-notification-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
         @keyframes heart-pop {
             0% { transform: scale(1); }
             38% { transform: scale(1.32); }
@@ -467,6 +468,13 @@
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"></path>
                             </svg>
                         </button>
+                        <span id="like-notification-status" class="like-notification-status" role="status" aria-live="polite"></span>
+                        <form id="like-notification-form" method="post" target="like-notification-response" hidden>
+                            <input name="action" type="hidden" value="like">
+                            <input id="like-response-token" name="responseToken" type="hidden">
+                            <input id="like-visitor-id" name="visitorId" type="hidden">
+                        </form>
+                        <iframe name="like-notification-response" title="Respons notifikasi suka" hidden></iframe>
                         <span><strong>M Nabil Zidan Nursyahidan</strong><span>Call me for whatever you need</span></span>
                     </div>
                 </div>
@@ -618,6 +626,88 @@
         document.getElementById("year").textContent = new Date().getFullYear();
 
         const captionLike = document.getElementById("caption-like");
+        const likeNotificationForm = document.getElementById("like-notification-form");
+        const likeNotificationStatus = document.getElementById("like-notification-status");
+        const likeResponseToken = document.getElementById("like-response-token");
+        const likeVisitorInput = document.getElementById("like-visitor-id");
+        const likeNotificationKey = "portfolio-like-notification-sent";
+        const likeVisitorKey = "portfolio-like-visitor-id";
+        let likeNotificationPending = false;
+        let likeNotificationTimeout;
+        let likeVisitorId = "";
+
+        function createRequestToken() {
+            return Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) =>
+                byte.toString(16).padStart(2, "0")
+            ).join("");
+        }
+
+        function getLikeVisitorId() {
+            if (likeVisitorId) return likeVisitorId;
+            try {
+                likeVisitorId = localStorage.getItem(likeVisitorKey) || "";
+                if (!/^[a-f0-9]{32}$/.test(likeVisitorId)) {
+                    likeVisitorId = createRequestToken();
+                    localStorage.setItem(likeVisitorKey, likeVisitorId);
+                }
+            } catch (error) {
+                console.error("Tidak dapat menyimpan identitas anonim tombol suka:", error);
+                likeVisitorId = createRequestToken();
+                likeNotificationStatus.textContent = "Browser tidak mengizinkan penyimpanan lokal; notifikasi hanya dapat dibatasi selama halaman ini terbuka.";
+            }
+            return likeVisitorId;
+        }
+
+        function notifyLikeByEmail() {
+            if (likeNotificationPending) return;
+            try {
+                if (localStorage.getItem(likeNotificationKey) === "true") return;
+            } catch (error) {
+                console.error("Tidak dapat memeriksa riwayat notifikasi suka:", error);
+            }
+
+            if (!suggestionResponseUrl) {
+                likeNotificationStatus.textContent = "Notifikasi suka belum aktif karena URL Google Apps Script belum tersedia.";
+                return;
+            }
+
+            const token = createRequestToken();
+            likeResponseToken.value = token;
+            likeVisitorInput.value = getLikeVisitorId();
+            likeNotificationForm.action = suggestionResponseUrl;
+            likeNotificationPending = true;
+            likeNotificationStatus.textContent = "Mengirim notifikasi suka...";
+
+            const handleLikeResponse = (messageEvent) => {
+                const result = messageEvent.data;
+                if (!result || result.type !== "like-result" || result.token !== token) return;
+
+                window.clearTimeout(likeNotificationTimeout);
+                window.removeEventListener("message", handleLikeResponse);
+                likeNotificationPending = false;
+                if (result.success) {
+                    try {
+                        localStorage.setItem(likeNotificationKey, "true");
+                    } catch (error) {
+                        console.error("Tidak dapat menyimpan status notifikasi suka:", error);
+                    }
+                    likeNotificationStatus.textContent = result.notified
+                        ? "Notifikasi suka berhasil dikirim."
+                        : "Notifikasi suka dari browser ini sudah pernah dikirim.";
+                } else {
+                    likeNotificationStatus.textContent = "Notifikasi suka gagal dikirim. Matikan lalu nyalakan kembali tombol hati untuk mencoba lagi.";
+                }
+            };
+
+            window.addEventListener("message", handleLikeResponse);
+            likeNotificationTimeout = window.setTimeout(() => {
+                window.removeEventListener("message", handleLikeResponse);
+                likeNotificationPending = false;
+                likeNotificationStatus.textContent = "Pengiriman notifikasi belum terkonfirmasi. Matikan lalu nyalakan kembali tombol hati untuk mencoba lagi.";
+            }, 20000);
+            likeNotificationForm.submit();
+        }
+
         captionLike.addEventListener("animationend", () => captionLike.classList.remove("is-animating"));
         captionLike.addEventListener("click", () => {
             const isLiked = captionLike.getAttribute("aria-pressed") === "true";
@@ -626,6 +716,7 @@
             captionLike.classList.remove("is-animating");
             void captionLike.offsetWidth;
             captionLike.classList.add("is-animating");
+            if (!isLiked) notifyLikeByEmail();
         });
 
         const themeToggle = document.getElementById("theme-toggle");
@@ -661,9 +752,7 @@
 
             suggestionSubmit.disabled = true;
             suggestionStatus.textContent = "Sedang mengirim saran...";
-            const token = Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) =>
-                byte.toString(16).padStart(2, "0")
-            ).join("");
+            const token = createRequestToken();
             suggestionText.value = suggestion;
             suggestionToken.value = token;
             suggestionForm.action = suggestionResponseUrl;
@@ -679,7 +768,7 @@
                     suggestionText.value = "";
                     suggestionStatus.textContent = "Saran berhasil dikirim. Terima kasih!";
                 } else {
-                    suggestionStatus.textContent = "Arigathanks Gozaimuch!";
+                    suggestionStatus.textContent = "Saran belum terkirim. Periksa koneksi lalu coba lagi.";
                 }
                 suggestionSubmit.disabled = false;
             };
@@ -687,7 +776,7 @@
             window.addEventListener("message", handleResponse);
             responseTimeout = window.setTimeout(() => {
                 window.removeEventListener("message", handleResponse);
-                suggestionStatus.textContent = "Arigathanks Gozaimuch!";
+                suggestionStatus.textContent = "Belum ada konfirmasi pengiriman. Periksa koneksi lalu coba lagi.";
                 suggestionSubmit.disabled = false;
             }, 20000);
             suggestionForm.submit();
