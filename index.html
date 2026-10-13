@@ -363,9 +363,9 @@
         .certificate-panel[hidden] { display: none; }
         .certificate-panel h3 { margin: 12px 0; font-size: 18px; }
         .certificate-status { color: var(--muted); font-size: 13px; }
-        .certificate-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
-        .certificate-item { display: block; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; color: var(--ink); background: var(--paper); }
-        .certificate-item img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: var(--white); }
+        .certificate-list { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+        .certificate-item { display: block; width: min(100%, 760px); overflow: hidden; border: 1px solid var(--line); border-radius: 14px; color: var(--ink); background: var(--paper); }
+        .certificate-item img { display: block; width: 100%; height: auto; max-height: 82vh; object-fit: contain; background: var(--white); }
         .certificate-item span { display: block; padding: 10px 12px; font-size: 13px; font-weight: 600; }
         .dialog-close { padding: 9px 13px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: var(--white); cursor: pointer; }
         .toast {
@@ -804,7 +804,7 @@
         });
 
         async function loadCertificates(requestId) {
-            const supportedExtensions = ["pdf", "jpg", "jpeg", "png", "webp"];
+            const supportedExtensions = ["webp", "jpg", "jpeg", "png", "pdf"];
             const maxCertificates = 100;
             const certificateDirectory = "sertifikat/";
             const certificates = [];
@@ -814,16 +814,17 @@
 
             try {
                 for (let number = 1; number <= maxCertificates; number += 1) {
-                    const candidates = await Promise.all(supportedExtensions.map(async (extension) => {
+                    let found = null;
+                    for (const extension of supportedExtensions) {
                         const filename = `${certificateDirectory}sertifikat${number}.${extension}`;
                         const response = await fetch(filename, { method: "HEAD" });
-                        if (response.status === 404) return null;
+                        if (response.status === 404) continue;
                         if (!response.ok) throw new Error(`Tidak dapat memeriksa ${filename} (${response.status}).`);
-                        return { filename, extension };
-                    }));
+                        found = { filename, extension };
+                        break;
+                    }
 
                     if (requestId !== certificateRequestId) return;
-                    const found = candidates.find(Boolean);
                     if (!found) break;
                     certificates.push({ number, ...found });
                 }
@@ -855,6 +856,7 @@
                     image.src = filename;
                     image.alt = `Pratinjau sertifikat ${number}`;
                     image.loading = "lazy";
+                    image.decoding = "async";
                     link.append(image);
                 }
 
