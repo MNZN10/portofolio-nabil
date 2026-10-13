@@ -358,6 +358,15 @@
         .dialog-footer { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 14px 5px 4px; }
         .dialog-footer h2 { margin: 0 0 3px; font-size: 16px; }
         .dialog-footer p { margin: 0; color: var(--muted); font-size: 12px; }
+        .certificate-toggle { margin-top: 12px; }
+        .certificate-panel { padding: 8px 5px 14px; }
+        .certificate-panel[hidden] { display: none; }
+        .certificate-panel h3 { margin: 12px 0; font-size: 18px; }
+        .certificate-status { color: var(--muted); font-size: 13px; }
+        .certificate-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+        .certificate-item { display: block; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; color: var(--ink); background: var(--paper); }
+        .certificate-item img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: var(--white); }
+        .certificate-item span { display: block; padding: 10px 12px; font-size: 13px; font-weight: 600; }
         .dialog-close { padding: 9px 13px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: var(--white); cursor: pointer; }
         .toast {
             position: fixed;
@@ -516,6 +525,7 @@
                             data-image="profile-campus.png"
                             data-title="Perjalanan di kampus"
                             data-description="Momen sebagai mahasiswa Fisika di Universitas Pendidikan Indonesia."
+                            data-certificates="true"
                             aria-label="Lihat gambar: Perjalanan di kampus">
                         <img src="profile-campus.png" alt="Nabil berpose di depan Gedung C FMIPA dengan jaket Fisika UPI" loading="eager">
                         <span class="visual-info">
@@ -596,9 +606,15 @@
             <div>
                 <h2 id="dialog-title"></h2>
                 <p id="dialog-description"></p>
+                <button class="button-primary certificate-toggle" id="certificate-toggle" type="button" hidden aria-expanded="false" aria-controls="certificate-panel">Lihat sertifikat</button>
             </div>
             <button class="dialog-close" id="dialog-close" type="button">Tutup</button>
         </div>
+        <section class="certificate-panel" id="certificate-panel" aria-labelledby="certificate-title" hidden>
+            <h3 id="certificate-title">Sertifikat</h3>
+            <p class="certificate-status" id="certificate-status" role="status" aria-live="polite"></p>
+            <div class="certificate-list" id="certificate-list"></div>
+        </section>
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -620,6 +636,11 @@
 
         const imageDialog = document.getElementById("image-dialog");
         const dialogImage = document.getElementById("dialog-image");
+        const certificateToggle = document.getElementById("certificate-toggle");
+        const certificatePanel = document.getElementById("certificate-panel");
+        const certificateStatus = document.getElementById("certificate-status");
+        const certificateList = document.getElementById("certificate-list");
+        let certificateRequestId = 0;
         const toast = document.getElementById("toast");
         let toastTimer;
 
@@ -782,12 +803,91 @@
             suggestionForm.submit();
         });
 
+        async function loadCertificates(requestId) {
+            const supportedExtensions = ["pdf", "jpg", "jpeg", "png", "webp"];
+            const maxCertificates = 100;
+            const certificates = [];
+
+            certificateList.replaceChildren();
+            certificateStatus.textContent = "Sedang mencari sertifikat...";
+
+            try {
+                for (let number = 1; number <= maxCertificates; number += 1) {
+                    const candidates = await Promise.all(supportedExtensions.map(async (extension) => {
+                        const filename = `sertifikat${number}.${extension}`;
+                        const response = await fetch(filename, { method: "HEAD" });
+                        if (response.status === 404) return null;
+                        if (!response.ok) throw new Error(`Tidak dapat memeriksa ${filename} (${response.status}).`);
+                        return { filename, extension };
+                    }));
+
+                    if (requestId !== certificateRequestId) return;
+                    const found = candidates.find(Boolean);
+                    if (!found) break;
+                    certificates.push({ number, ...found });
+                }
+            } catch (error) {
+                console.error("Gagal memeriksa file sertifikat:", error);
+                certificateStatus.textContent = window.location.protocol === "file:"
+                    ? "Daftar sertifikat otomatis tersedia setelah situs dipublikasikan melalui GitHub Pages."
+                    : "Sertifikat tidak dapat dimuat. Periksa koneksi lalu coba lagi.";
+                return;
+            }
+
+            if (requestId !== certificateRequestId) return;
+            if (certificates.length === 0) {
+                certificateStatus.textContent = "Belum ada sertifikat. Unggah sertifikat1 dengan ekstensi .pdf, .jpg, .jpeg, .png, atau .webp ke folder yang sama dengan index.html.";
+                return;
+            }
+
+            certificateStatus.textContent = `${certificates.length} sertifikat ditemukan.`;
+            certificates.forEach(({ number, filename, extension }) => {
+                const link = document.createElement("a");
+                link.className = "certificate-item";
+                link.href = filename;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                link.setAttribute("aria-label", `Buka sertifikat ${number}`);
+
+                if (extension !== "pdf") {
+                    const image = document.createElement("img");
+                    image.src = filename;
+                    image.alt = `Pratinjau sertifikat ${number}`;
+                    image.loading = "lazy";
+                    link.append(image);
+                }
+
+                const label = document.createElement("span");
+                label.textContent = `Sertifikat ${number}${extension === "pdf" ? " · PDF" : ""}`;
+                link.append(label);
+                certificateList.append(link);
+            });
+        }
+
+        certificateToggle.addEventListener("click", () => {
+            const isExpanded = certificateToggle.getAttribute("aria-expanded") === "true";
+            certificateToggle.setAttribute("aria-expanded", String(!isExpanded));
+            certificatePanel.hidden = isExpanded;
+            certificateToggle.textContent = isExpanded ? "Lihat sertifikat" : "Sembunyikan sertifikat";
+            if (!isExpanded) {
+                certificateRequestId += 1;
+                loadCertificates(certificateRequestId);
+            } else {
+                certificateRequestId += 1;
+            }
+        });
+
         document.querySelectorAll(".visual-card").forEach((card) => {
             card.addEventListener("click", () => {
                 dialogImage.src = card.dataset.image;
                 dialogImage.alt = card.querySelector("img").alt;
                 document.getElementById("dialog-title").textContent = card.dataset.title;
                 document.getElementById("dialog-description").textContent = card.dataset.description;
+                certificateRequestId += 1;
+                certificatePanel.hidden = true;
+                certificateToggle.hidden = card.dataset.certificates !== "true";
+                certificateToggle.setAttribute("aria-expanded", "false");
+                certificateToggle.textContent = "Lihat sertifikat";
                 imageDialog.showModal();
             });
         });
