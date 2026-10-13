@@ -25,13 +25,13 @@
         }
         :root[data-theme="soft-light"] {
             color-scheme: light;
-            --ink: #334238;
-            --muted: #66746b;
-            --green: #587660;
-            --green-dark: #3e5a47;
-            --paper: #e3e8e2;
-            --line: #cfd8d0;
-            --white: #edf0eb;
+            --ink: #303a34;
+            --muted: #68716c;
+            --green: #627d69;
+            --green-dark: #405b48;
+            --paper: #e5e8e6;
+            --line: #ccd2ce;
+            --white: #f2f4f2;
         }
 
         * { box-sizing: border-box; }
@@ -45,7 +45,7 @@
         }
         :root[data-theme="soft-light"] body {
             background:
-                radial-gradient(ellipse at 8% 5%, rgba(190, 205, 190, .55), transparent 29rem),
+                radial-gradient(ellipse at 8% 5%, rgba(207, 216, 209, .72), transparent 31rem),
                 var(--paper);
         }
         a { color: inherit; text-decoration: none; }
@@ -102,7 +102,7 @@
             cursor: pointer;
             transition: transform .2s ease, background .2s ease, border-color .2s ease;
         }
-        :root[data-theme="soft-light"] .theme-toggle { background: #e9ede7; }
+        :root[data-theme="soft-light"] .theme-toggle { background: #eef1ef; }
         .theme-toggle:hover { transform: translateY(-2px); background: var(--white); }
         .theme-toggle svg { width: 19px; height: 19px; }
         .theme-toggle .icon-sun { display: none; }
@@ -208,7 +208,7 @@
             transition: color .2s ease, transform .2s ease;
         }
         .caption-like:hover { transform: scale(1.06); }
-        .caption-like[aria-pressed="true"] svg { fill: #e1306c; stroke: none; }
+        .caption-like[aria-pressed="true"] svg { fill: #e53935; stroke: none; }
         .caption-like.is-animating svg { animation: heart-pop .36s cubic-bezier(.2, .8, .3, 1); }
         .caption-like:focus-visible {
             outline: 3px solid #8bac98;
@@ -240,13 +240,13 @@
         }
         :root[data-theme="soft-light"] .about-card,
         :root[data-theme="soft-light"] .purpose-card {
-            background: #edf0eb;
-            box-shadow: 0 12px 30px rgba(48, 65, 53, .06);
+            background: #f0f2f0;
+            box-shadow: 0 14px 34px rgba(43, 57, 48, .055);
         }
         :root[data-theme="soft-light"] .about-card .card-label { color: var(--green); }
         :root[data-theme="soft-light"] .purpose-card {
             color: var(--ink);
-            background: linear-gradient(135deg, #c7d8c9, #d5dfd2);
+            background: linear-gradient(135deg, #d0dbd2, #dce2dd);
         }
         :root[data-theme="soft-light"] .purpose-card .card-label { color: #3e5a47; }
         .about-card p { margin: 13px 0 0; color: var(--muted); font-size: 14px; line-height: 1.9; }
@@ -259,9 +259,9 @@
         .focus-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 23px; }
         .focus-tag { padding: 8px 12px; border: 1px solid #414844; border-radius: 999px; color: #d2d9d3; background: #343a36; font-size: 12px; font-weight: 600; }
         :root[data-theme="soft-light"] .focus-tag {
-            border-color: #d0dbd0;
-            color: #3e5a47;
-            background: #e6ece5;
+            border-color: #d2d8d3;
+            color: #405b48;
+            background: #e9ecea;
         }
         .gallery-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; gap: clamp(14px, 2vw, 20px); }
         .visual-card {
@@ -296,8 +296,8 @@
         .contact-section .button-primary:hover { background: #eaf0eb; }
         :root[data-theme="soft-light"] .contact-section {
             color: var(--ink);
-            background: linear-gradient(115deg, #cbd9cc, #d8e1d5);
-            box-shadow: 0 16px 36px rgba(48, 65, 53, .08);
+            background: linear-gradient(115deg, #d6dfd8, #e1e5e2);
+            box-shadow: 0 16px 36px rgba(43, 57, 48, .07);
         }
         :root[data-theme="soft-light"] .contact-section p { color: var(--muted); }
         :root[data-theme="soft-light"] .contact-section .button-primary { background: var(--white); }
@@ -335,8 +335,8 @@
         .suggestion-card .button-primary { justify-self: start; }
         .suggestion-card .button-primary:disabled { cursor: wait; opacity: .7; }
         :root[data-theme="soft-light"] .suggestion-card {
-            background: #edf0eb;
-            box-shadow: 0 12px 30px rgba(48, 65, 53, .06);
+            background: #f0f2f0;
+            box-shadow: 0 14px 34px rgba(43, 57, 48, .055);
         }
         footer { display: flex; justify-content: space-between; gap: 16px; padding: 28px 0; color: var(--muted); font-size: 12px; }
         dialog {
