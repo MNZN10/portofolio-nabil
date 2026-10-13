@@ -358,15 +358,15 @@
         .dialog-footer { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 14px 5px 4px; }
         .dialog-footer h2 { margin: 0 0 3px; font-size: 16px; }
         .dialog-footer p { margin: 0; color: var(--muted); font-size: 12px; }
-        .certificate-toggle { margin-top: 12px; }
-        .certificate-panel { padding: 8px 5px 14px; }
-        .certificate-panel[hidden] { display: none; }
-        .certificate-panel h3 { margin: 12px 0; font-size: 18px; }
-        .certificate-status { color: var(--muted); font-size: 13px; }
-        .certificate-list { display: flex; flex-direction: column; align-items: center; gap: 18px; }
-        .certificate-item { display: block; width: min(100%, 760px); overflow: hidden; border: 1px solid var(--line); border-radius: 14px; color: var(--ink); background: var(--paper); }
-        .certificate-item img { display: block; width: 100%; height: auto; max-height: 82vh; object-fit: contain; background: var(--white); }
-        .certificate-item span { display: block; padding: 10px 12px; font-size: 13px; font-weight: 600; }
+        .collection-toggle { margin-top: 12px; }
+        .collection-panel { padding: 8px 5px 14px; }
+        .collection-panel[hidden] { display: none; }
+        .collection-panel h3 { margin: 12px 0; font-size: 18px; }
+        .collection-status { color: var(--muted); font-size: 13px; }
+        .collection-list { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+        .collection-item { display: block; width: min(100%, 760px); overflow: hidden; border: 1px solid var(--line); border-radius: 14px; color: var(--ink); background: var(--paper); }
+        .collection-item img { display: block; width: 100%; height: auto; max-height: 82vh; object-fit: contain; background: var(--white); }
+        .collection-item span { display: block; padding: 10px 12px; font-size: 13px; font-weight: 600; }
         .dialog-close { padding: 9px 13px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: var(--white); cursor: pointer; }
         .toast {
             position: fixed;
@@ -526,8 +526,11 @@
                             data-image="profile-campus.png"
                             data-title="Perjalanan di kampus"
                             data-description="Momen sebagai mahasiswa Fisika di Universitas Pendidikan Indonesia."
-                            data-certificates="true"
-                            aria-label="Lihat gambar: Perjalanan di kampus">
+                                data-folder="sertifikat"
+                                data-file-prefix="sertifikat"
+                                data-action-label="Lihat sertifikat"
+                                data-collection-title="Sertifikat"
+                                aria-label="Lihat gambar: Perjalanan di kampus">
                         <img src="profile-campus.png" alt="Nabil berpose di depan Gedung C FMIPA dengan jaket Fisika UPI" loading="eager">
                         <span class="visual-info">
                             <strong>Perjalanan di kampus</strong>
@@ -538,6 +541,10 @@
                             data-image="profile-experiment.jpg"
                             data-title="Eksperimen &amp; analisis"
                             data-description="Mengamati, menguji, dan berkarya."
+                            data-folder="eksperimen"
+                            data-file-prefix="eksperimen"
+                            data-action-label="Lihat eksperimen"
+                            data-collection-title="Eksperimen"
                             aria-label="Lihat gambar: Eksperimen dan analisis">
                         <img src="profile-experiment.jpg" alt="Peralatan laboratorium untuk kegiatan eksperimen" loading="eager">
                         <span class="visual-info">
@@ -549,6 +556,10 @@
                             data-image="profile-technology.jpg"
                             data-title="Teknologi &amp; inovasi"
                             data-description="Menjembatani pemikiran sains dengan solusi digital."
+                            data-folder="project"
+                            data-file-prefix="project"
+                            data-action-label="Lihat projek"
+                            data-collection-title="Projek"
                             aria-label="Lihat gambar: Teknologi dan inovasi">
                         <img src="profile-technology.jpg" alt="Komponen teknologi dan papan sirkuit elektronik" loading="eager">
                         <span class="visual-info">
@@ -607,14 +618,14 @@
             <div>
                 <h2 id="dialog-title"></h2>
                 <p id="dialog-description"></p>
-                <button class="button-primary certificate-toggle" id="certificate-toggle" type="button" hidden aria-expanded="false" aria-controls="certificate-panel">Lihat sertifikat</button>
+                <button class="button-primary collection-toggle" id="collection-toggle" type="button" hidden aria-expanded="false" aria-controls="collection-panel"></button>
             </div>
             <button class="dialog-close" id="dialog-close" type="button">Tutup</button>
         </div>
-        <section class="certificate-panel" id="certificate-panel" aria-labelledby="certificate-title" hidden>
-            <h3 id="certificate-title">Sertifikat</h3>
-            <p class="certificate-status" id="certificate-status" role="status" aria-live="polite"></p>
-            <div class="certificate-list" id="certificate-list"></div>
+        <section class="collection-panel" id="collection-panel" aria-labelledby="collection-title" hidden>
+            <h3 id="collection-title"></h3>
+            <p class="collection-status" id="collection-status" role="status" aria-live="polite"></p>
+            <div class="collection-list" id="collection-list"></div>
         </section>
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -637,11 +648,13 @@
 
         const imageDialog = document.getElementById("image-dialog");
         const dialogImage = document.getElementById("dialog-image");
-        const certificateToggle = document.getElementById("certificate-toggle");
-        const certificatePanel = document.getElementById("certificate-panel");
-        const certificateStatus = document.getElementById("certificate-status");
-        const certificateList = document.getElementById("certificate-list");
-        let certificateRequestId = 0;
+        const collectionToggle = document.getElementById("collection-toggle");
+        const collectionPanel = document.getElementById("collection-panel");
+        const collectionTitle = document.getElementById("collection-title");
+        const collectionStatus = document.getElementById("collection-status");
+        const collectionList = document.getElementById("collection-list");
+        let collectionRequestId = 0;
+        let activeCollection = null;
         const toast = document.getElementById("toast");
         let toastTimer;
 
@@ -804,20 +817,19 @@
             suggestionForm.submit();
         });
 
-        async function loadCertificates(requestId) {
+        async function loadCollection(requestId, collection) {
             const supportedExtensions = ["webp", "jpg", "jpeg", "png"];
-            const maxCertificates = 100;
-            const certificateDirectory = "sertifikat/";
-            const certificates = [];
+            const maxFiles = 100;
+            const files = [];
 
-            certificateList.replaceChildren();
-            certificateStatus.textContent = "Sedang mencari sertifikat...";
+            collectionList.replaceChildren();
+            collectionStatus.textContent = `Sedang mencari ${collection.title.toLowerCase()}...`;
 
             try {
-                for (let number = 1; number <= maxCertificates; number += 1) {
+                for (let number = 1; number <= maxFiles; number += 1) {
                     let found = null;
                     for (const extension of supportedExtensions) {
-                        const filename = `${certificateDirectory}sertifikat${number}.${extension}`;
+                        const filename = `${collection.folder}/${collection.prefix}${number}.${extension}`;
                         const response = await fetch(filename, { method: "HEAD" });
                         if (response.status === 404) continue;
                         if (!response.ok) throw new Error(`Tidak dapat memeriksa ${filename} (${response.status}).`);
@@ -825,54 +837,56 @@
                         break;
                     }
 
-                    if (requestId !== certificateRequestId) return;
+                    if (requestId !== collectionRequestId) return;
                     if (!found) break;
-                    certificates.push({ number, ...found });
+                    files.push({ number, ...found });
                 }
             } catch (error) {
-                console.error("Gagal memeriksa file sertifikat:", error);
-                certificateStatus.textContent = window.location.protocol === "file:"
-                    ? "Daftar sertifikat otomatis tersedia setelah situs dipublikasikan melalui GitHub Pages."
-                    : "Sertifikat tidak dapat dimuat. Periksa koneksi lalu coba lagi.";
+                console.error(`Gagal memeriksa file ${collection.title.toLowerCase()}:`, error);
+                collectionStatus.textContent = window.location.protocol === "file:"
+                    ? `Daftar ${collection.title.toLowerCase()} otomatis tersedia setelah situs dipublikasikan melalui GitHub Pages.`
+                    : `${collection.title} tidak dapat dimuat. Periksa koneksi lalu coba lagi.`;
                 return;
             }
 
-            if (requestId !== certificateRequestId) return;
-            if (certificates.length === 0) {
-                certificateStatus.textContent = "Belum ada gambar sertifikat. Unggah file gambar bernomor berurutan dengan ekstensi .webp, .jpg, .jpeg, atau .png ke folder sertifikat.";
+            if (requestId !== collectionRequestId) return;
+            if (files.length === 0) {
+                collectionStatus.textContent = `Belum ada gambar ${collection.title.toLowerCase()}. Tambahkan file gambar bernomor berurutan ke folder ${collection.folder}.`;
                 return;
             }
 
-            certificateStatus.textContent = `${certificates.length} sertifikat ditemukan.`;
-            certificates.forEach(({ number, filename }) => {
+            collectionStatus.textContent = `${files.length} ${collection.title.toLowerCase()} ditemukan.`;
+            files.forEach(({ number, filename }) => {
                 const item = document.createElement("div");
-                item.className = "certificate-item";
-                item.setAttribute("aria-label", `Sertifikat ${number}`);
+                item.className = "collection-item";
+                item.setAttribute("aria-label", `${collection.title} ${number}`);
 
                 const image = document.createElement("img");
                 image.src = filename;
-                image.alt = `Sertifikat ${number}`;
+                image.alt = `${collection.title} ${number}`;
                 image.loading = "lazy";
                 image.decoding = "async";
                 item.append(image);
 
                 const label = document.createElement("span");
-                label.textContent = `Sertifikat ${number}`;
+                label.textContent = `${collection.title} ${number}`;
                 item.append(label);
-                certificateList.append(item);
+                collectionList.append(item);
             });
         }
 
-        certificateToggle.addEventListener("click", () => {
-            const isExpanded = certificateToggle.getAttribute("aria-expanded") === "true";
-            certificateToggle.setAttribute("aria-expanded", String(!isExpanded));
-            certificatePanel.hidden = isExpanded;
-            certificateToggle.textContent = isExpanded ? "Lihat sertifikat" : "Sembunyikan sertifikat";
+        collectionToggle.addEventListener("click", () => {
+            const isExpanded = collectionToggle.getAttribute("aria-expanded") === "true";
+            collectionToggle.setAttribute("aria-expanded", String(!isExpanded));
+            collectionPanel.hidden = isExpanded;
+            collectionToggle.textContent = isExpanded
+                ? activeCollection.actionLabel
+                : `Sembunyikan ${activeCollection.title.toLowerCase()}`;
             if (!isExpanded) {
-                certificateRequestId += 1;
-                loadCertificates(certificateRequestId);
+                collectionRequestId += 1;
+                loadCollection(collectionRequestId, activeCollection);
             } else {
-                certificateRequestId += 1;
+                collectionRequestId += 1;
             }
         });
 
@@ -882,11 +896,20 @@
                 dialogImage.alt = card.querySelector("img").alt;
                 document.getElementById("dialog-title").textContent = card.dataset.title;
                 document.getElementById("dialog-description").textContent = card.dataset.description;
-                certificateRequestId += 1;
-                certificatePanel.hidden = true;
-                certificateToggle.hidden = card.dataset.certificates !== "true";
-                certificateToggle.setAttribute("aria-expanded", "false");
-                certificateToggle.textContent = "Lihat sertifikat";
+                collectionRequestId += 1;
+                collectionList.replaceChildren();
+                collectionStatus.textContent = "";
+                activeCollection = card.dataset.folder ? {
+                    folder: card.dataset.folder,
+                    prefix: card.dataset.filePrefix,
+                    actionLabel: card.dataset.actionLabel,
+                    title: card.dataset.collectionTitle,
+                } : null;
+                collectionPanel.hidden = true;
+                collectionToggle.hidden = !activeCollection;
+                collectionToggle.setAttribute("aria-expanded", "false");
+                collectionToggle.textContent = activeCollection?.actionLabel || "";
+                if (activeCollection) collectionTitle.textContent = activeCollection.title;
                 imageDialog.showModal();
             });
         });
