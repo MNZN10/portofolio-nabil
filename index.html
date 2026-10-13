@@ -695,7 +695,7 @@
                         ? "Notifikasi suka berhasil dikirim."
                         : "Notifikasi suka dari browser ini sudah pernah dikirim.";
                 } else {
-                    likeNotificationStatus.textContent = "Notifikasi suka gagal dikirim. Matikan lalu nyalakan kembali tombol hati untuk mencoba lagi.";
+                    likeNotificationStatus.textContent = "Arigathanks Gozaimuch!";
                 }
             };
 
@@ -703,7 +703,7 @@
             likeNotificationTimeout = window.setTimeout(() => {
                 window.removeEventListener("message", handleLikeResponse);
                 likeNotificationPending = false;
-                likeNotificationStatus.textContent = "Pengiriman notifikasi belum terkonfirmasi. Matikan lalu nyalakan kembali tombol hati untuk mencoba lagi.";
+                likeNotificationStatus.textContent = "Arigathanks Gozaimuch!";
             }, 20000);
             likeNotificationForm.submit();
         }
