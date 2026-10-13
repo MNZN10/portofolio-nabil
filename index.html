@@ -173,6 +173,7 @@
             object-fit: cover;
             object-position: center 35%;
             box-shadow: 0 25px 65px rgba(35, 57, 47, .18);
+            cursor: zoom-in;
         }
         .image-caption {
             position: absolute;
@@ -470,6 +471,10 @@
                     <img class="hero-image"
                          src="profile-portrait.png"
                          alt="Potret Nabil mengenakan jas almamater merah UPI"
+                         role="button"
+                         tabindex="0"
+                         aria-haspopup="dialog"
+                         aria-label="Perbesar foto potret Nabil"
                          fetchpriority="high">
                     <div class="image-caption">
                         <button class="caption-like" id="caption-like" type="button" aria-label="Sukai profil" aria-pressed="false">
@@ -484,7 +489,7 @@
                             <input id="like-visitor-id" name="visitorId" type="hidden">
                         </form>
                         <iframe name="like-notification-response" title="Respons notifikasi suka" hidden></iframe>
-                        <span><strong>M Nabil Zidan Nursyahidan</strong><span>Call me for whatever you need -165 cm 53 kg-</span></span>
+                        <span><strong>M Nabil Zidan Nursyahidan</strong><span>Call me for whatever you need</span></span>
                     </div>
                 </div>
             </section>
@@ -895,28 +900,51 @@
             }
         });
 
+        function showImageDialog({ image, alt, title, description, collection = null }) {
+            dialogImage.src = image;
+            dialogImage.alt = alt;
+            document.getElementById("dialog-title").textContent = title;
+            document.getElementById("dialog-description").textContent = description;
+            collectionRequestId += 1;
+            collectionList.replaceChildren();
+            collectionStatus.textContent = "";
+            activeCollection = collection;
+            collectionPanel.hidden = true;
+            collectionToggle.hidden = !activeCollection;
+            collectionToggle.setAttribute("aria-expanded", "false");
+            collectionToggle.textContent = activeCollection?.actionLabel || "";
+            if (activeCollection) collectionTitle.textContent = activeCollection.title;
+            imageDialog.showModal();
+        }
+
+        const portraitImage = document.querySelector(".hero-image");
+        const openPortrait = () => showImageDialog({
+            image: "profile-portrait-featured.png",
+            alt: portraitImage.alt,
+            title: "Potret Nabil",
+            description: "Mahasiswa Fisika · Universitas Pendidikan Indonesia",
+        });
+        portraitImage.addEventListener("click", openPortrait);
+        portraitImage.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                openPortrait();
+            }
+        });
+
         document.querySelectorAll(".visual-card").forEach((card) => {
-            card.addEventListener("click", () => {
-                dialogImage.src = card.dataset.image;
-                dialogImage.alt = card.querySelector("img").alt;
-                document.getElementById("dialog-title").textContent = card.dataset.title;
-                document.getElementById("dialog-description").textContent = card.dataset.description;
-                collectionRequestId += 1;
-                collectionList.replaceChildren();
-                collectionStatus.textContent = "";
-                activeCollection = card.dataset.folder ? {
+            card.addEventListener("click", () => showImageDialog({
+                image: card.dataset.image,
+                alt: card.querySelector("img").alt,
+                title: card.dataset.title,
+                description: card.dataset.description,
+                collection: card.dataset.folder ? {
                     folder: card.dataset.folder,
                     prefix: card.dataset.filePrefix,
                     actionLabel: card.dataset.actionLabel,
                     title: card.dataset.collectionTitle,
-                } : null;
-                collectionPanel.hidden = true;
-                collectionToggle.hidden = !activeCollection;
-                collectionToggle.setAttribute("aria-expanded", "false");
-                collectionToggle.textContent = activeCollection?.actionLabel || "";
-                if (activeCollection) collectionTitle.textContent = activeCollection.title;
-                imageDialog.showModal();
-            });
+                } : null,
+            }));
         });
 
         document.getElementById("dialog-close").addEventListener("click", () => imageDialog.close());
