@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#f6f7f4">
+    <meta name="theme-color" content="#111813">
     <meta name="description" content="Profil personal branding M Nabil Zidan Nursyahidan, mahasiswa Fisika UPI yang tertarik pada sains, teknologi, dan pengembangan diri.">
     <title>M Nabil Zidan Nursyahidan — Personal Portfolio</title>
     <script>document.documentElement.classList.add("js-enabled");</script>
@@ -12,16 +12,26 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            color-scheme: light;
-            --ink: #18231f;
-            --muted: #69766f;
-            --green: #587568;
-            --green-dark: #304a40;
-            --paper: #f6f7f4;
-            --line: #e5e9e3;
-            --white: #fff;
+            color-scheme: dark;
+            --ink: #e6eee7;
+            --muted: #a9b7ac;
+            --green: #a8c5a9;
+            --green-dark: #31503a;
+            --paper: #111813;
+            --line: #2b392e;
+            --white: #202b23;
             font-family: "DM Sans", sans-serif;
             scroll-behavior: smooth;
+        }
+        :root[data-theme="soft-light"] {
+            color-scheme: light;
+            --ink: #334238;
+            --muted: #66746b;
+            --green: #587660;
+            --green-dark: #3e5a47;
+            --paper: #e3e8e2;
+            --line: #cfd8d0;
+            --white: #edf0eb;
         }
 
         * { box-sizing: border-box; }
@@ -29,9 +39,14 @@
             margin: 0;
             color: var(--ink);
             background:
-                radial-gradient(ellipse at 8% 5%, rgba(224, 234, 226, .72), transparent 29rem),
+                radial-gradient(ellipse at 8% 5%, rgba(48, 78, 54, .5), transparent 29rem),
                 var(--paper);
             line-height: 1.65;
+        }
+        :root[data-theme="soft-light"] body {
+            background:
+                radial-gradient(ellipse at 8% 5%, rgba(190, 205, 190, .55), transparent 29rem),
+                var(--paper);
         }
         a { color: inherit; text-decoration: none; }
         button { font: inherit; }
@@ -41,8 +56,9 @@
             align-items: center;
             justify-content: space-between;
             min-height: 82px;
-            border-bottom: 1px solid rgba(48, 74, 64, .1);
+            border-bottom: 1px solid rgba(190, 210, 190, .12);
         }
+        :root[data-theme="soft-light"] .site-header { border-bottom-color: rgba(62, 90, 71, .16); }
         .wordmark { display: flex; align-items: center; gap: 11px; font-weight: 700; letter-spacing: -.03em; }
         .wordmark-mark {
             display: grid;
@@ -56,7 +72,7 @@
             font-size: 15px;
         }
         .nav-links { display: flex; align-items: center; gap: 32px; color: var(--muted); font-size: 13px; }
-        .nav-links a:not(.nav-cta):hover { color: var(--green-dark); }
+        .nav-links a:not(.nav-cta):hover { color: var(--green); }
         .nav-cta, .button-primary {
             display: inline-flex;
             align-items: center;
@@ -71,11 +87,32 @@
         }
         .nav-cta { min-height: 44px; padding: 10px 17px; }
         .button-primary { min-height: 46px; padding: 12px 20px; font-size: 14px; cursor: pointer; }
+        .theme-toggle {
+            display: inline-grid;
+            flex: 0 0 42px;
+            width: 42px;
+            height: 42px;
+            place-items: center;
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            color: var(--green);
+            background: rgba(37, 50, 40, .9);
+            cursor: pointer;
+            transition: transform .2s ease, background .2s ease, border-color .2s ease;
+        }
+        :root[data-theme="soft-light"] .theme-toggle { background: #e9ede7; }
+        .theme-toggle:hover { transform: translateY(-2px); background: var(--white); }
+        .theme-toggle svg { width: 19px; height: 19px; }
+        .theme-toggle .icon-sun { display: none; }
+        :root[data-theme="soft-light"] .theme-toggle .icon-moon { display: none; }
+        :root[data-theme="soft-light"] .theme-toggle .icon-sun { display: block; }
         .nav-cta:hover, .button-primary:hover {
             transform: translateY(-2px);
             background: #243b32;
             box-shadow: 0 9px 20px rgba(48, 74, 64, .17);
         }
+        :root[data-theme="soft-light"] .nav-cta:hover,
+        :root[data-theme="soft-light"] .button-primary:hover { background: #344d3c; }
         .hero {
             display: grid;
             grid-template-columns: 1.06fr .94fr;
@@ -105,7 +142,8 @@
             line-height: 1.08;
         }
         h1 span { color: var(--green); }
-        .hero-role { margin-bottom: 16px; color: var(--green-dark); font-size: 15px; font-weight: 600; }
+        .hero-role { margin-bottom: 16px; color: var(--green); font-size: 15px; font-weight: 600; }
+        :root[data-theme="soft-light"] .hero-role { color: var(--green-dark); }
         .hero-copy { max-width: 505px; margin-bottom: 26px; color: var(--muted); font-size: 16px; line-height: 1.8; }
         .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
         .button-secondary {
@@ -114,12 +152,14 @@
             gap: 8px;
             min-height: 44px;
             padding: 10px 15px;
-            color: var(--green-dark);
+            color: var(--green);
             font-size: 13px;
             font-weight: 600;
             transition: color .2s ease;
         }
-        .button-secondary:hover { color: var(--green); }
+        .button-secondary:hover { color: #c5ddc6; }
+        :root[data-theme="soft-light"] .button-secondary { color: var(--green-dark); }
+        :root[data-theme="soft-light"] .button-secondary:hover { color: var(--green); }
         .hero-visual { position: relative; padding: 0 13px 17px 0; }
         .hero-image {
             display: block;
@@ -143,9 +183,13 @@
             padding: 14px 17px;
             border: 1px solid rgba(255, 255, 255, .65);
             border-radius: 16px;
-            background: rgba(255, 255, 255, .92);
+            background: rgba(28, 39, 32, .96);
             box-shadow: 0 12px 32px rgba(24, 35, 31, .12);
             backdrop-filter: blur(12px);
+        }
+        :root[data-theme="soft-light"] .image-caption {
+            border-color: rgba(198, 210, 199, .95);
+            background: rgba(237, 240, 235, .97);
         }
         .caption-icon {
             display: grid;
@@ -154,8 +198,12 @@
             height: 40px;
             place-items: center;
             border-radius: 13px;
+            color: var(--green);
+            background: #2a3b30;
+        }
+        :root[data-theme="soft-light"] .caption-icon {
             color: var(--green-dark);
-            background: #eaf0eb;
+            background: #dce5dc;
         }
         .image-caption strong, .image-caption span { display: block; }
         .image-caption strong { font-size: 12px; }
@@ -170,15 +218,33 @@
             padding: clamp(22px, 3vw, 32px);
             border: 1px solid var(--line);
             border-radius: 22px;
-            background: rgba(255, 255, 255, .75);
+            background: #292e2b;
         }
+        :root[data-theme="soft-light"] .about-card,
+        :root[data-theme="soft-light"] .purpose-card {
+            background: #edf0eb;
+            box-shadow: 0 12px 30px rgba(48, 65, 53, .06);
+        }
+        :root[data-theme="soft-light"] .about-card .card-label { color: var(--green); }
+        :root[data-theme="soft-light"] .purpose-card {
+            color: var(--ink);
+            background: linear-gradient(135deg, #c7d8c9, #d5dfd2);
+        }
+        :root[data-theme="soft-light"] .purpose-card .card-label { color: #3e5a47; }
         .about-card p { margin: 13px 0 0; color: var(--muted); font-size: 14px; line-height: 1.9; }
-        .card-label { color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
-        .purpose-card { display: flex; flex-direction: column; justify-content: space-between; color: white; background: var(--green-dark); }
-        .purpose-card .card-label { color: #c3d6c9; }
+        .card-label { color: #d2d9d3; font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+        .purpose-card { display: flex; flex-direction: column; justify-content: space-between; color: #f1f4f1; background: #294632; }
+        .purpose-card .card-label { color: #d4e2d5; }
+        :root[data-theme="soft-light"] .purpose-card .card-label { color: #405b49; }
+        :root[data-theme="soft-light"] .purpose-card blockquote { color: #354139; }
         .purpose-card blockquote { margin: 28px 0 10px; font-family: "Manrope", sans-serif; font-size: clamp(20px, 3vw, 27px); font-weight: 500; letter-spacing: -.035em; line-height: 1.45; }
         .focus-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 23px; }
-        .focus-tag { padding: 8px 12px; border: 1px solid #dfe7df; border-radius: 999px; color: #3e594b; background: #f2f5f1; font-size: 12px; font-weight: 600; }
+        .focus-tag { padding: 8px 12px; border: 1px solid #414844; border-radius: 999px; color: #d2d9d3; background: #343a36; font-size: 12px; font-weight: 600; }
+        :root[data-theme="soft-light"] .focus-tag {
+            border-color: #d0dbd0;
+            color: #3e5a47;
+            background: #e6ece5;
+        }
         .gallery-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; gap: clamp(14px, 2vw, 20px); }
         .visual-card {
             overflow: hidden;
@@ -186,12 +252,16 @@
             border: 1px solid var(--line);
             border-radius: 20px;
             text-align: left;
-            background: white;
+            background: var(--white);
             cursor: zoom-in;
             transition: transform .25s ease, box-shadow .25s ease;
         }
         .visual-card:hover, .visual-card:focus-visible { transform: translateY(-5px); box-shadow: 0 17px 35px rgba(35, 57, 47, .12); }
         .visual-card:focus-visible, .button-primary:focus-visible, .nav-cta:focus-visible, .button-secondary:focus-visible, .dialog-close:focus-visible {
+            outline: 3px solid #8bac98;
+            outline-offset: 4px;
+        }
+        .theme-toggle:focus-visible {
             outline: 3px solid #8bac98;
             outline-offset: 4px;
         }
@@ -201,11 +271,53 @@
         .visual-info strong, .visual-info span { display: block; }
         .visual-info strong { margin-bottom: 5px; font-family: "Manrope", sans-serif; font-size: 15px; }
         .visual-info span { color: var(--muted); font-size: 13px; line-height: 1.6; }
-        .contact-section { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: clamp(26px, 4vw, 40px); border-radius: 24px; color: white; background: linear-gradient(115deg, #304a40, #597767); }
+        .contact-section { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: clamp(26px, 4vw, 40px); border-radius: 24px; color: white; background: linear-gradient(115deg, #17251b, #263d2b); }
         .contact-section h2 { margin: 0 0 5px; font-size: clamp(23px, 3vw, 32px); letter-spacing: -.04em; }
         .contact-section p { margin: 0; color: #d7e1da; font-size: 13px; }
         .contact-section .button-primary { flex: 0 0 auto; color: var(--green-dark); background: white; }
         .contact-section .button-primary:hover { background: #eaf0eb; }
+        :root[data-theme="soft-light"] .contact-section {
+            color: var(--ink);
+            background: linear-gradient(115deg, #cbd9cc, #d8e1d5);
+            box-shadow: 0 16px 36px rgba(48, 65, 53, .08);
+        }
+        :root[data-theme="soft-light"] .contact-section p { color: var(--muted); }
+        :root[data-theme="soft-light"] .contact-section .button-primary { background: var(--white); }
+        :root[data-theme="soft-light"] .contact-section .button-primary:hover { background: #e0e8df; }
+        .suggestion-section { padding: clamp(58px, 7vw, 78px) 0; border-top: 1px solid var(--line); }
+        .suggestion-card {
+            display: grid;
+            gap: 18px;
+            max-width: 760px;
+            padding: clamp(22px, 3vw, 32px);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            background: var(--white);
+        }
+        .suggestion-card label { color: var(--ink); font-size: 13px; font-weight: 600; }
+        .suggestion-card textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 14px 16px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            color: var(--ink);
+            background: var(--paper);
+            font: inherit;
+            line-height: 1.7;
+            resize: vertical;
+        }
+        .suggestion-card textarea::placeholder { color: var(--muted); opacity: .8; }
+        .suggestion-card textarea:focus-visible {
+            outline: 3px solid #8bac98;
+            outline-offset: 3px;
+        }
+        .suggestion-help { margin: -8px 0 0; color: var(--muted); font-size: 12px; }
+        .suggestion-card .button-primary { justify-self: start; }
+        :root[data-theme="soft-light"] .suggestion-card {
+            background: #edf0eb;
+            box-shadow: 0 12px 30px rgba(48, 65, 53, .06);
+        }
         footer { display: flex; justify-content: space-between; gap: 16px; padding: 28px 0; color: var(--muted); font-size: 12px; }
         dialog {
             width: min(860px, calc(100% - 32px));
@@ -216,15 +328,16 @@
             border: 1px solid rgba(255, 255, 255, .3);
             border-radius: 20px;
             color: var(--ink);
-            background: white;
+            background: var(--white);
             box-shadow: 0 25px 90px rgba(0, 0, 0, .3);
         }
         dialog::backdrop { background: rgba(15, 27, 22, .72); backdrop-filter: blur(5px); }
-        .dialog-image { display: block; width: 100%; max-height: 70vh; border-radius: 13px; object-fit: contain; background: #edf0ed; }
+        .dialog-image { display: block; width: 100%; max-height: 70vh; border-radius: 13px; object-fit: contain; background: #19231c; }
+        :root[data-theme="soft-light"] .dialog-image { background: #dfe6de; }
         .dialog-footer { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 14px 5px 4px; }
         .dialog-footer h2 { margin: 0 0 3px; font-size: 16px; }
         .dialog-footer p { margin: 0; color: var(--muted); font-size: 12px; }
-        .dialog-close { padding: 9px 13px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: white; cursor: pointer; }
+        .dialog-close { padding: 9px 13px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: var(--white); cursor: pointer; }
         .toast {
             position: fixed;
             z-index: 5;
@@ -292,6 +405,15 @@
             <nav class="nav-links" aria-label="Navigasi utama">
                 <a href="#tentang">Tentang</a>
                 <a href="#fokus">Fokus</a>
+                <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Aktifkan tema cerah lembut" title="Aktifkan tema cerah lembut">
+                    <svg class="icon-moon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.2 15.3A8.5 8.5 0 0 1 8.7 3.8 8.5 8.5 0 1 0 20.2 15.3Z"></path>
+                    </svg>
+                    <svg class="icon-sun" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+                    </svg>
+                </button>
                 <a class="nav-cta" href="#kontak">Mari terhubung <span aria-hidden="true">↗</span></a>
             </nav>
         </header>
@@ -398,12 +520,26 @@
                 </div>
             </section>
 
+            <section class="suggestion-section" aria-labelledby="suggestion-title">
+                <div class="section-heading scroll-reveal">
+                    <span class="eyebrow">Masukan Anda</span>
+                    <h2 id="suggestion-title">Bantu saya mengembangkan portofolio.</h2>
+                    <p>Punya ide atau saran? Tuliskan di sini, lalu kirimkan langsung melalui email.</p>
+                </div>
+                <form class="suggestion-card scroll-reveal" id="suggestion-form">
+                    <label for="suggestion-text">Saran untuk portofolio</label>
+                    <textarea id="suggestion-text" name="suggestion" placeholder="Tuliskan saran Anda di sini..." required></textarea>
+                    <p class="suggestion-help">Tombol kirim akan membuka aplikasi email dengan saran Anda siap dikirim.</p>
+                    <button class="button-primary" type="submit">Kirim saran <span aria-hidden="true">↗</span></button>
+                </form>
+            </section>
+
             <section class="contact-section scroll-reveal" id="kontak" aria-labelledby="contact-title">
                 <div>
                     <h2 id="contact-title">Punya ide untuk dibicarakan?</h2>
                     <p>Terbuka untuk berkolaborasi dan bertukar perspektif
-                        Follow saya di Instagram untuk komunikasi lebih lanjut
-                        dan ikuti juga saya di Strava untuk upgrade fisik setiap saat!</p>
+                        Follow saya di Instagram untuk komunikasi lebih lanjut.
+                        Yuk, ikuti aktivitas olahraga saya di Strava!</p>
                 </div>
                 <a class="button-primary" href="https://www.instagram.com/reynurmagomedov?mdxt=aGV1ZjhxcDIwbHBr" target="_blank" rel="noopener noreferrer">
                     Kunjungi Instagram <span aria-hidden="true">↗</span>
@@ -454,6 +590,30 @@
         let toastTimer;
 
         document.getElementById("year").textContent = new Date().getFullYear();
+
+        const themeToggle = document.getElementById("theme-toggle");
+        themeToggle.addEventListener("click", () => {
+            const isSoftLight = document.documentElement.dataset.theme !== "soft-light";
+            document.documentElement.dataset.theme = isSoftLight ? "soft-light" : "";
+            const label = isSoftLight ? "Aktifkan tema saat ini" : "Aktifkan tema cerah lembut";
+            themeToggle.setAttribute("aria-label", label);
+            themeToggle.title = label;
+            document.querySelector('meta[name="theme-color"]').content = isSoftLight ? "#e3e8e2" : "#111813";
+        });
+
+        document.getElementById("suggestion-form").addEventListener("submit", (event) => {
+            event.preventDefault();
+            const suggestion = document.getElementById("suggestion-text").value.trim();
+            if (!suggestion) {
+                document.getElementById("suggestion-text").value = "";
+                document.getElementById("suggestion-text").reportValidity();
+                return;
+            }
+
+            const subject = encodeURIComponent("Saran untuk pengembangan portofolio");
+            const body = encodeURIComponent(suggestion);
+            window.location.href = `mailto:mnabilzidann@gmail.com?subject=${subject}&body=${body}`;
+        });
 
         document.querySelectorAll(".visual-card").forEach((card) => {
             card.addEventListener("click", () => {
